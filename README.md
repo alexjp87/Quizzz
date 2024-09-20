@@ -12,9 +12,17 @@ I have personally found both knowledge checks and educational games to be of gre
 Who doesn't enjoy Snake?!
 
 
+### Agile Development
+
+For this project I aim to develop using agile methodology, i.e. break the project down into phases.
+
+Phase 1 will be building an object-oriented version of snake using a FreeCodeCamp tutorial via Youtube.
+
+Then I aim to edit the code and implement one by one each of the features required for my application idea, with the design and implementation of each feature representing a new development phase.
+
 ### User stories
 
-From the perspective of the player:
+From the perspective of the user:
 - As a student, I want to have fun while I learn
 - As a student, I want to learn in a visual way
 - As a student, I want to use knowledge checks to reinforce my learning
@@ -24,13 +32,6 @@ From the perspective of the developer:
 - As a beginner developer, I want to build something that will challenge me and help me improve my development skills
 - As a beginner developer, I want to build something that combines education and fun
 
-### Agile Development
-
-For this project I aim to develop using agile methodology, i.e. break the project down into phases.
-
-Phase 1 will be building an object-oriented version of snake using a FreeCodeCamp tutorial via Youtube.
-
-Then I aim to edit the code and implement one by one each of the features required for my application idea, with the desigand implementation of each feature representing a new phase.
 
 ###
 
