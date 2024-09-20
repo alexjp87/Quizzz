@@ -23,3 +23,17 @@ From the perspective of the developer:
 - As a beginner developer, I want to build something that will be useful in reinforcing learning
 - As a beginner developer, I want to build something that will challenge me and help me improve my development skills
 - As a beginner developer, I want to build something that combines education and fun
+
+### Agile Development
+
+For this project I aim to develop using agile methodology, i.e. break the project down into phases.
+
+Phase 1 will be building an object-oriented version of snake using a FreeCodeCamp tutorial via Youtube.
+
+Then I aim to edit the code and implement one by one each of the features required for my application idea, with the desigand implementation of each feature representing a new phase.
+
+###
+
+
+### Credits
+FreeCodeCamp Snake Tutorial: https://www.youtube.com/watch?v=XGf2GcyHPhc&t=2736s
