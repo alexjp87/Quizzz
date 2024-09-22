@@ -58,15 +58,15 @@ class snake():
         self.dirny = 1
 # Create snake move function:
     def move(self):
-    # Listen for input events:
-    # check if quit event has occurred (e.g. click x in top right corner of window) [event.get() fetches then removes all input events from event queue]
+# Listen for input events:
+# check if quit event has occurred (e.g. click x in top right corner of window) [event.get() fetches then removes all input events from event queue]
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-        # if so, uninitialise all currently initialised pygame modules, i.e. quit game
+# if so, uninitialise all currently initialised pygame modules, i.e. quit game
                 pygame.quit()
 # Else:
 # Create a (dictionary?) containing every key on keyboard as keys with booleans as values (True = pressed)
-    # Using this method to move snake instead of e.g.<if event.type = key_LEFT> because smoother - adjusts to multiple key presses at once better than other method - WHY? Something to do with not having to process each event before can listen for next one? ...             
+    # Using this method to move snake instead of e.g.<if event.type = key_LEFT> because smoother - e.g. adjusts to multiple key presses at once better than other method - WHY? Something to do with not having to process each event before can listen for next one? ...             
             keys = pygame.key.get_pressed()
 # loop through keys and check if any boolean values = True
             for key in keys:
@@ -77,7 +77,8 @@ class snake():
 # y axis direction = 0 (because SEE LINE 56)                    
                     self.dirny = 0
 # tell every cube in snake body list (SEE LINE 54) to turn in same direction as head when reach same position by appending to turns dictionary LINE 47 (key = head coordinates ([x,y]) at turn event position, value = turn direction (e.g.[0,-1]))
-                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny] # [: index poisiton = slice() all items in dictionary]
+                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+                    # [: index poisiton = slice() all items in a sequence (e.g. dictionary) (makes a copy)]
 
 # repeat for if right (K_RIGHT), up (K_UP) or down (K_DOWN) values = True:
                 elif keys[pygame.K_RIGHT]:
@@ -92,6 +93,39 @@ class snake():
                     self.dirnx = 0
                     self.dirny = 1
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+# enumerate() self.body list LINE 55 and loop through indexes (i) and cube objects LINE 27 (c) (for each cube in the snake, before moving check upcoming position to see if in turns list) [enumerate() turns a collection (e.g. list) into an enumerate object using a counter as keys and the collection items as values (e.g. [(0, 'a'), (1, 'b')] or {(0 : 'a'), (1 : 'b')}) ]
+        for i, c in enumerate(self.body):
+# declare p variable as cube object position (SEE LINE 53)            
+            p = c.pos[:]
+# Check if position exists in self.turns LINE 81 ('is' rather than 'is in' because self.turns only has 1 item?)
+            if p is self.turns:
+# if so, declare turn variable as position ([x,y])
+                turn = self.turns[p]
+# move cube object in specified direction?
+                c.move(turn[0], turn[1])
+# check if we have reached the last cube object of the self.body list, i.e. the last cube of the snake (because length of list = length of snake, so length of list - 1 = last cube)
+                if i == len(self.body - 1):
+# if so, remove the position from self.turns (so snake doesn't try to turn every time hits that position) [.pop() removes an element from a specified position in a sequence e.g. list]
+                    self.turns.pop(p)
+# Else:       
+        else:
+# Check if snake has reached left edge of grid (i.e. if moving left (dirnx == -1) and x axis value of position is <= 0, i.e. further than the left boundary of the grid (top left corner = [0,0]))
+            if c.dirnx == -1 and c.pos[0] <= 0:
+# if so, set x axis position to right side of grid and keep y axis position the same (rows = 20 (LINE 208), so c.rows - 1 = 19, i.e. right edge position of grid)
+                c.pos = (c.rows - 1, c.pos[1])
+# repeat check for if snake has reached right, top or bottom grid edge:
+            elif c.dirnx == 1 and c.pos[0] >= c.rows - 1:
+                c.pos = (0, c.pos[1])
+            elif c.dirny == 1 and c.pos[1] >= c.rows - 1:
+                c.pos = (c.pos[0], 0)
+            elif c.dirny == -1 and c.pos[1] <= 0:
+                c.pos = (c.pos[0]. c.rows - 1)
+# Else (if snake isn't turning and hasn't reached an edge):
+            else:
+# continue moving in the cube object's current direction
+                c.move(c.dirnx, c.dirny)
+
+
 
 # Create reset function (placeholder)
     def reset(self, pos):
@@ -110,7 +144,7 @@ class snake():
 
 # Create drawGrid function:
 def drawGrid(w, rows, surface):
-# set gap size to width // rows  - WHY? (integer divide = nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2)
+# set gap size to width // rows  - WHY? [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
     gapBtwn = w // rows
 # declare initial x and y axis variables with value 0
     x = 0
@@ -120,18 +154,16 @@ def drawGrid(w, rows, surface):
 # redeclare x and y axis variables
         x = x + gapBtwn
         y = y + gapBtwn
-# draw grid lines using pygame draw module [draw.line() draws a straight line, taking 4 arguments: surface, colour, start position, end position] - UNDERSTAND START AND END POSITION VALUES??
-# vertical
-        pygame.draw.line(surface, (255,255,255), (x,0), (x, w))
-# horizontal       
-        pygame.draw.line(surface, (255,255,255), (0,y), (w, y))
+# draw grid lines using pygame draw module [draw.line() draws a straight line, takes 4 arguments: surface, colour, start position, end position] - UNDERSTAND START AND END POSITION VALUES??
+        pygame.draw.line(surface, (255,255,255), (x,0), (x, w)) # vertical lines
+        pygame.draw.line(surface, (255,255,255), (0,y), (w, y)) # horizontal lines      
 
 
 # Create redrawWindow function:
 def redrawWindow(surface):
 # make width and rows variables global
     global width, rows
-# set fullscreen mode + black background [Surface.fill() fills display with colour - no argument = whole display filled]
+# set (fullscreen mode?) + black background [surface.fill() fills display with colour (no position argument = whole display filled)]
     surface.fill((0,0,0))
 # call drawGrid() function
     drawGrid(width, rows, surface)
@@ -170,10 +202,10 @@ def game():
     rows = 20
 # create game grid using pygame display module
     win = pygame.display.set_mode((width, height))
-# create snake - takes colour and position arguments: red and position (position is the middle because rows set to 20?)
+# create snake (colour, position)
     s = snake((255,0,0), (10,10))
 
-# Create Clock object using pygame time module [].Clock() creates an object for tracking time]
+# Create Clock object using pygame time module [.Clock() creates an object for tracking time]
     clock = pygame.time.Clock()
 
 # Create flag variable - WHY?
@@ -190,6 +222,6 @@ def game():
 # pause programme for 0.5 seconds to further reduce game speed - works in conjuntion with clock.tick() (lower value = higher game speed because less delay) [time.delay() pauses programme for number of milliseconds given as argument]
         pygame.time.delay(50)
 
-# set redrawWindow surface to win variable (LINE 170):
+# set redrawWindow surface to win variable (LINE 210):
         redrawWindow(win)
 
