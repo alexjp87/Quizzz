@@ -29,15 +29,46 @@ class cube(object):
     rows = 0
 # set intial w to 0
     w = 0
-# assign paramters for class creation using __init__ function (placeholder)
-    def __init__(self, start, dirnx=1, dirny=0, color=(255,0,0)):
-        pass
-# create move function (placeholder)
-    def move(self):
-        pass
-# create draw function (placeholder)
+# Assign paramters for class creation using __init__ function
+    def __init__(self, start, dirnx=1, dirny=0, colour=(255,0,0)): # default direction values used so that snake moves automatically from game start without requiring an input event
+# Define parameters:
+# why self.pos?
+        self.pos = start
+        self.dirnx = 1
+        self.dirny = 0
+        self.colour = colour
+
+# Create move function:
+    def move(self, dirnx, dirny):
+# define paramters:
+        self.dirnx = dirnx
+        self.dirny = dirny
+# ?
+        self.pos(self.pos[0] + dirnx, self.pos[1] + dirny)
+
+
+# Create draw function:
     def draw(self, surface, eyes=False):
-        pass
+# set gap size (dis) to width // rows  - WHY? [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
+        dis = self.w // self.rows
+# store x and y positions in variables (for ease of typing later)
+        i = self.pos[0] # rows (x)
+        j = self.pos[1] # columns (y)
+# draw rectangle (snake, or individual cube of snake???), parameters: surface, colour, (x, y, width, height) [draw.rect() draws a rectangle on a given surface (+ 1 pixels x and y and -2 pixels width and height means snake rectangle will be inside grid lines so grid lines remain visible???)]
+        pygame.draw.rect(surface, self.colour, (i*dis + 1, j*dis + 1, dis - 2, dis - 2))
+# Check if cube has 'eyes' (i.e. is the head cube):
+        if eyes:
+# if so, find middle of cube
+            centre = dis // 2
+# set 'eye' radius
+            radius = 3
+# set 'eye' positions (x,y)
+            circleMiddle = (i*dis+centre-radius, j*dis + 8)
+            circleMiddle2 = (i*dis + dis - radius*2, j*dis + 8)
+# draw 'eyes', parameters: surface, colour, centre (of circle), radius (of circle) [draw.circle() draws a circle on a given surface]
+            pygame.draw.circle(surface, (0,0,0), circleMiddle, radius)
+            pygame.draw.circle(surface, (0,0,0), circleMiddle2, radius)
+
 
 # Create snake object using class keyword:
 class snake():
@@ -49,7 +80,7 @@ class snake():
     def __init__(self, col, pos):
 # Define parameters:        
         self.col = col
-# track position of snake head - HOW?
+# track position of lead cube object, i.e. snake head
         self.head = cube(pos)
 # and append to snake body list (LINE 45) - want snake cubes ordered in body list so can then manipulate list i.e. manipulate snake
         self.body.append(self.head)
@@ -113,12 +144,12 @@ class snake():
             if c.dirnx == -1 and c.pos[0] <= 0:
 # if so, set x axis position to right side of grid and keep y axis position the same (rows = 20 (LINE 208), so c.rows - 1 = 19, i.e. right edge position of grid)
                 c.pos = (c.rows - 1, c.pos[1])
-# repeat check for if snake has reached right, top or bottom grid edge:
-            elif c.dirnx == 1 and c.pos[0] >= c.rows - 1:
+# repeat check for if snake has reached right, bottom or top grid edge:
+            elif c.dirnx == 1 and c.pos[0] >= c.rows - 1: # right edge
                 c.pos = (0, c.pos[1])
-            elif c.dirny == 1 and c.pos[1] >= c.rows - 1:
+            elif c.dirny == 1 and c.pos[1] >= c.rows - 1: # bottom edge
                 c.pos = (c.pos[0], 0)
-            elif c.dirny == -1 and c.pos[1] <= 0:
+            elif c.dirny == -1 and c.pos[1] <= 0: # top edge
                 c.pos = (c.pos[0]. c.rows - 1)
 # Else (if snake isn't turning and hasn't reached an edge):
             else:
@@ -133,9 +164,22 @@ class snake():
 # Create addCube function (placeholder)
     def addCube(self):
         pass
-# Create draw function (placeholder)
+
+# Create draw function:
     def draw(self, surface):
-        pass
+# loop through indexes (i) and cube objects (c) in enumerated self.body list (LINE 55) (i.e. loop through snake)
+        for i, c in enumerate(self.body):
+# check if current cube object is the head (i.e. leading cube)
+            if i == 0:
+# if so, draw cube with 'eyes' (LINE 39) (so user knows which end of snake is the front)
+                c.draw(surface, True)
+# else:
+            else:
+# draw cube without 'eyes' (default 'eyes' value is False LINE 47)
+                c.draw(surface)
+
+
+
 
 
 #-------------------------------------------------------------#
@@ -144,7 +188,7 @@ class snake():
 
 # Create drawGrid function:
 def drawGrid(w, rows, surface):
-# set gap size to width // rows  - WHY? [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
+# set gap size (gapBtwn) to width // rows  - WHY? [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
     gapBtwn = w // rows
 # declare initial x and y axis variables with value 0
     x = 0
@@ -161,10 +205,12 @@ def drawGrid(w, rows, surface):
 
 # Create redrawWindow function:
 def redrawWindow(surface):
-# make width and rows variables global
-    global width, rows
+# make width, rows and s variables global
+    global width, rows, s
 # set (fullscreen mode?) + black background [surface.fill() fills display with colour (no position argument = whole display filled)]
     surface.fill((0,0,0))
+# draw snake?
+    s.draw(surface)
 # call drawGrid() function
     drawGrid(width, rows, surface)
 # update window using pygame display module [display.update() updates a portion of a software display, value given as argument (no argument = update entire display)]
@@ -192,8 +238,8 @@ def message_box(subject, contact):
 ## Create game function (placeholder)
 def game():
 ## Create game grid:
-# make width and rows variables global
-    global width, rows
+# make width, rows and s variables global
+    global width, rows, s
 # set initial width to 500
     width = 500
 # set initial height to 500
@@ -225,3 +271,5 @@ def game():
 # set redrawWindow surface to win variable (LINE 210):
         redrawWindow(win)
 
+
+game()
