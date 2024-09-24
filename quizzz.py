@@ -30,7 +30,7 @@ class cube(object):
 # set intial w to 500 pixels
     w = 500
 # Assign paramters for class creation using __init__ function
-    def __init__(self, start, dirnx=1, dirny=0, colour=(255,0,0)): # default direction values used so that snake moves automatically from game start without requiring an input event
+    def __init__(self, start, dirnx=1, dirny=0, colour=(255,0,0)): # default direction values used so that snake moves automatically without requiring initial input event
 # Define parameters:
 # why self.pos?
         self.pos = start
@@ -54,7 +54,7 @@ class cube(object):
         i = self.pos[0] # rows (x)
         j = self.pos[1] # columns (y)
 # draw rectangle (snake, or individual cube of snake???), parameters: surface, colour, (x, y, width, height) [draw.rect() draws a rectangle on a given surface (+ 1 pixels x and y and -2 pixels width and height means snake rectangle will be inside grid lines so grid lines remain visible???)]
-        pygame.draw.rect(surface, self.colour, (i*dis + 1, j*dis + 1, dis - 2, dis - 2))
+        pygame.draw.rect(surface, self.colour, (i*dis+1, j*dis+1, dis-2, dis-2))
 # Check if cube has 'eyes' (i.e. is the head cube):
         if eyes:
 # if so, find middle of cube
@@ -62,23 +62,22 @@ class cube(object):
 # set 'eye' radius
             radius = 3
 # set 'eye' positions (x,y)
-            circleMiddle = (i*dis+centre-radius, j*dis + 8)
-            circleMiddle2 = (i*dis + dis - radius*2, j*dis + 8)
+            circleMiddle = (i*dis+centre-radius, j*dis+8)
+            circleMiddle2 = (i*dis + dis - radius*2, j*dis+8)
 # draw 'eyes', parameters: surface, colour, centre (of circle), radius (of circle) [draw.circle() draws a circle on a given surface]
             pygame.draw.circle(surface, (0,0,0), circleMiddle, radius)
             pygame.draw.circle(surface, (0,0,0), circleMiddle2, radius)
 
-
 # Create snake object using class keyword:
-class snake():
+class snake(object):
 # create empty body list
     body = []
 # create empty turns dictionary
     turns = {}
 # Assign paramters for class creation using __init__ function (colour, position)
-    def __init__(self, col, pos):
+    def __init__(self, colour, pos):
 # Define parameters:        
-        self.col = col
+        self.colour = colour
 # track position of lead cube object, i.e. snake head
         self.head = cube(pos)
 # and append to snake body list (LINE 45) - want snake cubes ordered in body list so can then manipulate list i.e. manipulate snake
@@ -134,35 +133,52 @@ class snake():
 # move cube object in specified direction?
                 c.move(turn[0], turn[1])
 # check if we have reached the last cube object of the self.body list, i.e. the last cube of the snake (because length of list = length of snake, so length of list - 1 = last cube)
-                if i == len(self.body) - 1:
+                if i == len(self.body)-1:
 # if so, remove the position from self.turns (so snake doesn't try to turn every time hits that position) [.pop() removes an element from a specified position in a sequence e.g. list]
                     self.turns.pop(p)
 # Else:       
-        else:
-# Check if snake has reached left edge of grid (i.e. if moving left (dirnx == -1) and x axis value of position is <= 0, i.e. further than the left boundary of the grid (top left corner = [0,0]))
-            if c.dirnx == -1 and c.pos[0] <= 0:
-# if so, set x axis position to right side of grid and keep y axis position the same (rows = 20 (LINE 208), so c.rows - 1 = 19, i.e. right edge position of grid)
-                c.pos = (c.rows - 1, c.pos[1])
-# repeat check for if snake has reached right, bottom or top grid edge:
-            elif c.dirnx == 1 and c.pos[0] >= c.rows - 1: # right edge
-                c.pos = (0, c.pos[1])
-            elif c.dirny == 1 and c.pos[1] >= c.rows - 1: # bottom edge
-                c.pos = (c.pos[0], 0)
-            elif c.dirny == -1 and c.pos[1] <= 0: # top edge
-                c.pos = (c.pos[0], c.rows - 1)
-# Else (if snake isn't turning and hasn't reached an edge):
             else:
+# Check if snake has reached left edge of grid (i.e. if moving left (dirnx == -1) and x axis value of position is <= 0, i.e. further than the left boundary of the grid (top left corner = [0,0]))
+                if c.dirnx == -1 and c.pos[0] <= 0:
+# if so, set x axis position to right side of grid and keep y axis position the same (rows = 20 (LINE 208), so c.rows - 1 = 19, i.e. right edge position of grid)
+                    c.pos = (c.rows - 1, c.pos[1])
+# repeat check for if snake has reached right, bottom or top grid edge and re-assign positions as appropriate:
+                elif c.dirnx == 1 and c.pos[0] >= c.rows - 1: # right edge
+                    c.pos = (0, c.pos[1])
+                elif c.dirny == 1 and c.pos[1] >= c.rows - 1: # bottom edge
+                    c.pos = (c.pos[0], 0)
+                elif c.dirny == -1 and c.pos[1] <= 0: # top edge
+                    c.pos = (c.pos[0], c.rows - 1)
+# Else (if snake isn't turning and hasn't reached an edge):
+                else:
 # continue moving in the cube object's current direction
-                c.move(c.dirnx, c.dirny)
-
+                    c.move(c.dirnx, c.dirny)
 
 # Create reset function (placeholder)
     def reset(self, pos):
         pass
 
-# Create addCube function (placeholder)
+# Create addCube function:
     def addCube(self):
-        pass
+# find end of snake (last item in body list)
+        tail = self.body[-1]
+# find direction values for x and y axes (-1, 0 or 1)
+        dx, dy = tail.dirnx, tail.dirny
+# check if snake tail is moving right
+        if dx == 1 and dy == 0:
+# if so, append new cube to the left side of the tail (x position - 1)           
+            self.body.append(cube((tail.pos[0] - 1, tail.pos[1])))
+# repeat check for if snake tail is moving left, down or up and append new cube to appropriate position:
+        elif dx == -1 and dy == 0:
+            self.body.append(cube((tail.pos[0] + 1, tail.pos[1]))) # direction left: append x + 1
+        elif dx == 0 and dy == 1:
+            self.body.append(cube((tail.pos[0], tail.pos[1] - 1))) # direction down: append y - 1
+        elif dx == 0 and dy == -1:
+            self.body.append(cube((tail.pos[0], tail.pos[1] + 1))) # direction up: append y + 1
+# set direction for appended cube (same as tail cube)
+        self.body[-1].dirnx = dx
+        self.body[-1].dirny = dy
+
 
 # Create draw function:
     def draw(self, surface):
@@ -201,11 +217,13 @@ def drawGrid(w, rows, surface):
 # Create redrawWindow function:
 def redrawWindow(surface):
     # make width, rows and s variables global
-    global width, rows, s
+    global width, rows, s, snack
     # set (fullscreen mode?) + black background [surface.fill() fills display with colour (no position argument = whole display filled)]
     surface.fill((0,0,0))
-    # draw snake?
+    # draw snake using draw function LINE ?
     s.draw(surface)
+    # draw snack
+    snack.draw(surface)
     # call drawGrid() function
     drawGrid(width, rows, surface)
     # update window using pygame display module [display.update() updates a portion of a software display, value given as argument (no argument = update entire display)]
@@ -215,7 +233,7 @@ def redrawWindow(surface):
 def randomSnack(rows, item): # <item> parameter = snake object
     # make copy of snake cube objects list (LINE 85)
     positions = item.body
-    # Randomise 'snack' grid position:
+    # Create infinite loop to randomise 'snack' grid position:
     while True:
         # pick random x and y co-ordinates between 0 and 20 [random.randrange() returns a randomly selected element from a specified range (only one value in range defaults to stop value)(rows = 20, LINE 29)]
         x = random.randrange(rows)
@@ -248,7 +266,7 @@ def message_box(subject, contact):
 def game():
 ## Create game grid:
 # make width, rows and s variables global
-    global width, rows, s
+    global width, rows, s, snack
 # set initial width to 500 (height not needed because creating square grid (20 rows x 20 columns, 500px width x 500px height))
     width = 500
 # set initial rows to 20 (needs to divide by height)
@@ -257,22 +275,32 @@ def game():
     win = pygame.display.set_mode((width, width))
 # create snake using snake class LINE 73 (colour (red), position (row 10 column 10))
     s = snake((255,0,0), (10,10))
-# Create flag variable - WHY?
+# create random snack (LINE 213) using cube class (LINE 27)
+    snack = cube(randomSnack(rows, s), colour=(0,255,0))
+# declare flag as True
     flag = True
 # Create Clock object using pygame time module [time.Clock() creates an object for tracking time]
     clock = pygame.time.Clock()
 
 ## Loop:
-# Declare while loop condition as flag = True? WHY?
+# Create infinite loop:
     while flag:
-
 # Define game speed:
 # pause programme for 0.05 seconds (per frame?) to reduce game speed (works in conjuntion with clock.tick()) (lower value = higher game speed because less delay) [time.delay() pauses programme for number of milliseconds given as argument]
         pygame.time.delay(50)
 # prevent game from running at > 10 frames per second - means snake can move max 10 squares per second? (lower value = lower game speed because less frames per second) ['tick' argument = framerate per second, value in milliseconds]
         clock.tick(10)
-# 
+
+# Call move function (LINE 89?)
         s.move()
+
+# Check if head snake cube has hit snack poisiton:
+        if s.body[0].pos == snack.pos:
+# increase snake object length by 1 using addCube function LINE 162
+            s.addCube()
+# create new random snack
+            snack = cube(randomSnack(rows, s), colour=(0,255,0))
+
 
 # redraw window (LINE 202) surface (win variable LINE 241):
         redrawWindow(win)
