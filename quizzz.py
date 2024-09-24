@@ -6,16 +6,16 @@
 
 ## Import Modules and Packages
 
-# Import 'math' and 'random' modules
+# Import math and random modules
 import math
 import random
 
-# Import 'pygame' module
-import pygame
+# Import pygame and sys modules
+import pygame, sys
 
-# Import 'tkinter' package
+# Import tkinter package
 import tkinter as tk
-# Import 'messagebox' module from tk
+# Import messagebox module from tk
 from tkinter import messagebox
 
 
@@ -25,10 +25,10 @@ from tkinter import messagebox
 
 # Create cube object using class keyword:
 class cube(object):
-# set intial rows to 0
-    rows = 0
-# set intial w to 0
-    w = 0
+# set intial rows to 20
+    rows = 20
+# set intial w to 500 pixels
+    w = 500
 # Assign paramters for class creation using __init__ function
     def __init__(self, start, dirnx=1, dirny=0, colour=(255,0,0)): # default direction values used so that snake moves automatically from game start without requiring an input event
 # Define parameters:
@@ -43,9 +43,8 @@ class cube(object):
 # define paramters:
         self.dirnx = dirnx
         self.dirny = dirny
-# ?
-        self.pos(self.pos[0] + dirnx, self.pos[1] + dirny)
-
+# 
+        self.pos = (self.pos[0] + dirnx, self.pos[1] + dirny)
 
 # Create draw function:
     def draw(self, surface, eyes=False):
@@ -87,14 +86,14 @@ class snake():
 # track snake direction (if x = 1 or -1, y = 0, and vice versa because snake only moves in one direction at a time i.e. vertical OR horizontal)
         self.dirnx = 0
         self.dirny = 1
-# Create snake move function:
+# Create move function:
     def move(self):
 # Listen for input events:
 # check if quit event has occurred (e.g. click x in top right corner of window) [event.get() fetches then removes all input events from event queue]
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-# if so, uninitialise all currently initialised pygame modules, i.e. quit game
-                pygame.quit()
+# if so, uninitialise all currently initialised pygame modules, i.e. quit game (***changed <pygame.quit()> to <sys.exit() (imported LINE 14) to avoid error: "pygame.error: video system not initialized")
+                sys.exit()
 # Else:
 # Create a (dictionary?) containing every key on keyboard as keys with booleans as values (True = pressed)
     # Using this method to move snake instead of e.g.<if event.type = key_LEFT> because smoother - e.g. adjusts to multiple key presses at once better than other method - WHY? Something to do with not having to process each event before can listen for next one? ...             
@@ -128,14 +127,14 @@ class snake():
         for i, c in enumerate(self.body):
 # declare p variable as cube object position (SEE LINE 53)            
             p = c.pos[:]
-# Check if position exists in self.turns LINE 81 ('is' rather than 'is in' because self.turns only has 1 item?)
-            if p is self.turns:
+# Check if position exists in self.turns LINE 81
+            if p in self.turns:
 # if so, declare turn variable as position ([x,y])
                 turn = self.turns[p]
 # move cube object in specified direction?
                 c.move(turn[0], turn[1])
 # check if we have reached the last cube object of the self.body list, i.e. the last cube of the snake (because length of list = length of snake, so length of list - 1 = last cube)
-                if i == len(self.body - 1):
+                if i == len(self.body) - 1:
 # if so, remove the position from self.turns (so snake doesn't try to turn every time hits that position) [.pop() removes an element from a specified position in a sequence e.g. list]
                     self.turns.pop(p)
 # Else:       
@@ -150,17 +149,17 @@ class snake():
             elif c.dirny == 1 and c.pos[1] >= c.rows - 1: # bottom edge
                 c.pos = (c.pos[0], 0)
             elif c.dirny == -1 and c.pos[1] <= 0: # top edge
-                c.pos = (c.pos[0]. c.rows - 1)
+                c.pos = (c.pos[0], c.rows - 1)
 # Else (if snake isn't turning and hasn't reached an edge):
             else:
 # continue moving in the cube object's current direction
                 c.move(c.dirnx, c.dirny)
 
 
-
 # Create reset function (placeholder)
     def reset(self, pos):
         pass
+
 # Create addCube function (placeholder)
     def addCube(self):
         pass
@@ -179,46 +178,58 @@ class snake():
                 c.draw(surface)
 
 
-
-
-
 #-------------------------------------------------------------#
 
 ## Create Functions
 
 # Create drawGrid function:
 def drawGrid(w, rows, surface):
-# set gap size (gapBtwn) to width // rows  - WHY? [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
+    # set gap size (gapBtwn) to width // rows  - WHY? [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
     gapBtwn = w // rows
-# declare initial x and y axis variables with value 0
+    # declare initial x and y axis variables with value 0
     x = 0
     y = 0
-# loop through number of rows (20):
+    # loop through number of rows (20):
     for row in range(rows):
-# redeclare x and y axis variables
+        # redeclare x and y axis variables
         x = x + gapBtwn
         y = y + gapBtwn
-# draw grid lines using pygame draw module [draw.line() draws a straight line, takes 4 arguments: surface, colour, start position, end position] - UNDERSTAND START AND END POSITION VALUES??
+        # draw grid lines using pygame draw module [draw.line() draws a straight line, takes 4 arguments: surface, colour, start position, end position] - UNDERSTAND START AND END POSITION VALUES??
         pygame.draw.line(surface, (255,255,255), (x,0), (x, w)) # vertical lines
         pygame.draw.line(surface, (255,255,255), (0,y), (w, y)) # horizontal lines      
 
-
 # Create redrawWindow function:
 def redrawWindow(surface):
-# make width, rows and s variables global
+    # make width, rows and s variables global
     global width, rows, s
-# set (fullscreen mode?) + black background [surface.fill() fills display with colour (no position argument = whole display filled)]
+    # set (fullscreen mode?) + black background [surface.fill() fills display with colour (no position argument = whole display filled)]
     surface.fill((0,0,0))
-# draw snake?
+    # draw snake?
     s.draw(surface)
-# call drawGrid() function
+    # call drawGrid() function
     drawGrid(width, rows, surface)
-# update window using pygame display module [display.update() updates a portion of a software display, value given as argument (no argument = update entire display)]
+    # update window using pygame display module [display.update() updates a portion of a software display, value given as argument (no argument = update entire display)]
     pygame.display.update()
 
-# Create randomCube function (placeholder)
-def randomCube(rows, items):
-    pass
+# Create randomSnack function:
+def randomSnack(rows, item): # <item> parameter = snake object
+    # make copy of snake cube objects list (LINE 85)
+    positions = item.body
+    # Randomise 'snack' grid position:
+    while True:
+        # pick random x and y co-ordinates between 0 and 20 [random.randrange() returns a randomly selected element from a specified range (only one value in range defaults to stop value)(rows = 20, LINE 29)]
+        x = random.randrange(rows)
+        y = random.randrange(rows)
+        # check if the randomised position (x,y) is currently occupied by a snake cube object [filter(<function>,<iterable>) returns an iterable that is run through a function which tests items against a condition] [lambda denotes an anonymous funtion]
+        if len(list(filter(lambda z:z.pos == (x,y), positions))) > 0:
+            # if so, loop again (i.e. re-randomise co-ordinates)
+            continue
+        # else:
+        else:
+            # break loop
+            break
+    # and return randomised snack position
+    return (x,y)
 
 # Create message_box function (placeholder)
 def message_box(subject, contact):
@@ -227,49 +238,45 @@ def message_box(subject, contact):
 
 #-------------------------------------------------------------#
 
-
-
 ### GAME
 
 #
 #
 #
 
-## Create game function (placeholder)
+## Create game function
 def game():
 ## Create game grid:
 # make width, rows and s variables global
     global width, rows, s
-# set initial width to 500
+# set initial width to 500 (height not needed because creating square grid (20 rows x 20 columns, 500px width x 500px height))
     width = 500
-# set initial height to 500
-    height = 500
 # set initial rows to 20 (needs to divide by height)
     rows = 20
-# create game grid using pygame display module
-    win = pygame.display.set_mode((width, height))
-# create snake (colour, position)
+# create game grid using pygame display module [display.set_mode() creates a display surface (i.e. initialises a window or screen for display)]
+    win = pygame.display.set_mode((width, width))
+# create snake using snake class LINE 73 (colour (red), position (row 10 column 10))
     s = snake((255,0,0), (10,10))
-
-# Create Clock object using pygame time module [.Clock() creates an object for tracking time]
-    clock = pygame.time.Clock()
-
 # Create flag variable - WHY?
     flag = True
-
+# Create Clock object using pygame time module [time.Clock() creates an object for tracking time]
+    clock = pygame.time.Clock()
 
 ## Loop:
 # Declare while loop condition as flag = True? WHY?
     while flag:
 
 # Define game speed:
+# pause programme for 0.05 seconds (per frame?) to reduce game speed (works in conjuntion with clock.tick()) (lower value = higher game speed because less delay) [time.delay() pauses programme for number of milliseconds given as argument]
+        pygame.time.delay(50)
 # prevent game from running at > 10 frames per second - means snake can move max 10 squares per second? (lower value = lower game speed because less frames per second) ['tick' argument = framerate per second, value in milliseconds]
         clock.tick(10)
-# pause programme for 0.5 seconds to further reduce game speed - works in conjuntion with clock.tick() (lower value = higher game speed because less delay) [time.delay() pauses programme for number of milliseconds given as argument]
-        pygame.time.delay(50)
+# 
+        s.move()
 
-# set redrawWindow surface to win variable (LINE 210):
+# redraw window (LINE 202) surface (win variable LINE 241):
         redrawWindow(win)
 
+    pass
 
 game()
