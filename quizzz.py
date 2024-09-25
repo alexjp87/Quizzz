@@ -25,15 +25,14 @@ from tkinter import messagebox
 
 # Create cube object using class keyword:
 class cube(object):
-    # set intial rows to 20
+    # set rows to 20 pixels
     rows = 20
-    # set intial w to 500 pixels
+    # set width to 500 pixels
     w = 500
     # Assign paramters for class creation using __init__ function
     def __init__(self, start, dirnx=1, dirny=0, colour=(255,0,0)): # default direction values used so that snake moves automatically without requiring initial input event
 
     # Define parameters:
-    # why self.pos?
         self.pos = start
         self.dirnx = 1
         self.dirny = 0
@@ -44,19 +43,19 @@ class cube(object):
         # define paramters:
         self.dirnx = dirnx
         self.dirny = dirny
-        # set direction?
+        # set direction
         self.pos = (self.pos[0] + dirnx, self.pos[1] + dirny)
 
     # Create draw function:
     def draw(self, surface, eyes=False):
-        # set gap size (dis) to width // rows  - WHY? [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
+        # set gap size (dis) to width // rows [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
         dis = self.w // self.rows
         # store x and y positions in variables (for ease of typing later)
         i = self.pos[0] # rows (x)
         j = self.pos[1] # columns (y)
-        # draw rectangle (snake, or individual cube of snake???), parameters: surface, colour, (x, y, width, height) [draw.rect() draws a rectangle on a given surface (+ 1 pixels x and y and -2 pixels width and height means snake rectangle will be inside grid lines so grid lines remain visible???)]
+        # draw rectangle (cube), parameters: surface, colour, (x, y, width, height) [draw.rect() draws a rectangle on a given surface (+ 1 pixels x and y and -2 pixels width and height means snake rectangle will be inside grid lines so grid lines remain visible)]
         pygame.draw.rect(surface, self.colour, (i*dis+1, j*dis+1, dis-2, dis-2))
-        # Check if cube has 'eyes' (i.e. is the head cube):
+        # Check if cube should have 'eyes' (i.e. is the head cube):
         if eyes:
             # if so, find middle of cube
             centre = dis // 2
@@ -82,11 +81,12 @@ class snake(object):
         self.colour = colour
         # track position of lead cube object, i.e. snake head
         self.head = cube(pos)
-        # and append to snake body list (LINE 45) - want snake cubes ordered in body list so can then manipulate list i.e. manipulate snake
+        # and append to snake body list (LINE 75) - want snake cubes ordered in body list so can then manipulate list i.e. manipulate snake
         self.body.append(self.head)
         # track snake direction (if x = 1 or -1, y = 0, and vice versa because snake only moves in one direction at a time i.e. vertical OR horizontal)
         self.dirnx = 0
         self.dirny = 1
+    
     # Create move function:
     def move(self):
         # Listen for input events:
@@ -94,11 +94,12 @@ class snake(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
             # if so, uninitialise all currently initialised pygame modules, i.e. quit game (***changed <pygame.quit()> to <sys.exit() (imported LINE 14) to avoid error: "pygame.error: video system not initialized"***)
+                # pygame.quit() # COMMENTED
                 sys.exit()
             
             # Else:
             # Create a (dictionary?) containing every key on keyboard as keys with booleans as values (True = pressed)
-            # Using this method to move snake instead of e.g.<if event.type = key_LEFT> because smoother - e.g. adjusts to multiple key presses at once better than other method - WHY? Something to do with not having to process each event before can listen for next one? ...             
+                # Using this method to move snake instead of e.g.<if event.type = key_LEFT> because smoother - e.g. adjusts to multiple key presses at once better than other method - WHY? Something to do with not having to process each event before can listen for next one ...           
             keys = pygame.key.get_pressed()
             # loop through keys and check if any boolean values = True
             for key in keys:
@@ -106,11 +107,10 @@ class snake(object):
                 if keys[pygame.K_LEFT]:
                     # x axis direction = -1
                     self.dirnx = -1
-                    # y axis direction = 0 (because SEE LINE 56)                    
+                    # y axis direction = 0 (because SEE LINE 86)                    
                     self.dirny = 0
-                    # tell every cube in snake body list (SEE LINE 54) to turn in same direction as head when reach same position by appending to turns dictionary LINE 47 (key = head coordinates ([x,y]) at turn event position, value = turn direction (e.g.[0,-1]))
-                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
-                    # [: index poisiton = slice() all items in a sequence (e.g. dictionary) (makes a copy)]
+                    # tell every cube in snake body list to turn in same direction as head when reach same position by appending to turns dictionary LINE 77 (key = head coordinates ([x,y]) at turn event position, value = turn direction (e.g.[0,-1]))
+                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny] # [: index poisiton = slice() all items in a sequence (e.g. dictionary) (makes a copy)]
 
                 # repeat for if right (K_RIGHT), up (K_UP) or down (K_DOWN) values = True:
                 elif keys[pygame.K_RIGHT]:
@@ -126,15 +126,15 @@ class snake(object):
                     self.dirny = 1
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
         
-        # enumerate() self.body list LINE 55 and loop through indexes (i) and cube objects LINE 27 (c) (for each cube in the snake, before moving check upcoming position to see if in turns list) [enumerate() turns a collection (e.g. list) into an enumerate object using a counter as keys and the collection items as values (e.g. [(0, 'a'), (1, 'b')] or {(0 : 'a'), (1 : 'b')}) ]
+        # enumerate() self.body list and loop through indexes (i) and cube objects LINE 27 (c) (i.e. for each cube in the snake, before moving check upcoming position to see if in turns list) [enumerate() turns a collection (e.g. list) into an enumerate object using a counter as keys and the collection items as values (e.g. [(0, 'a'), (1, 'b')] or {(0 : 'a'), (1 : 'b')}) ]
         for i, c in enumerate(self.body):
-            # declare p variable as cube object position (SEE LINE 53)            
+            # declare p variable as cube object position (SEE LINE 83)            
             p = c.pos[:]
-            # Check if position exists in self.turns LINE 81
+            # Check if position exists in self.turns LINE 113
             if p in self.turns:
                 # if so, declare turn variable as position ([x,y])
                 turn = self.turns[p]
-                # move cube object in specified direction?
+                # move cube object in specified direction
                 c.move(turn[0], turn[1])
                 # check if we have reached the last cube object of the self.body list, i.e. the last cube of the snake (because length of list = length of snake, so length of list - 1 = last cube)
                 if i == len(self.body)-1:
@@ -161,7 +161,7 @@ class snake(object):
 
     # Create reset function:
     def reset(self, pos):
-        # reset length, position and direction of snake (SEE snake class LINES 74-87)
+        # reset length, position and direction of snake (SEE snake class LINES 73-88)
         self.body = []
         self.turns = {}
         self.head= cube(pos)
@@ -193,15 +193,15 @@ class snake(object):
 
     # Create draw function:
     def draw(self, surface):
-        # loop through indexes (i) and cube objects (c) in enumerated self.body list (LINE 55) (i.e. loop through snake)
+        # loop through indexes (i) and cube objects (c) in enumerated self.body list (i.e. loop through snake)
         for i, c in enumerate(self.body):
             # check if current cube object is the head (i.e. leading cube)
             if i == 0:
-                # if so, draw cube with 'eyes' (LINE 39) (so user knows which end of snake is the front)
+                # if so, draw cube with 'eyes' (LINE 59) (so user knows which end of snake is the front)
                 c.draw(surface, True)
             # else:
             else:
-                # draw cube without 'eyes' (default 'eyes' value is False LINE 47)
+                # draw cube without 'eyes' (default 'eyes' value is False LINE 50)
                 c.draw(surface)
 
 
@@ -211,17 +211,17 @@ class snake(object):
 
 # Create drawGrid function:
 def drawGrid(w, rows, surface):
-    # set gap size (gapBtwn) to width // rows  - WHY? [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
+    # set gap size (gapBtwn) to width // rows [// (integer divide) = round down to nearest whole number e.g. 7 // 4 = 1, 9 // 4 = 2]
     gapBtwn = w // rows
     # declare initial x and y axis variables with value 0
     x = 0
     y = 0
-    # loop through number of rows (20):
+    # loop through number of rows:
     for row in range(rows):
         # redeclare x and y axis variables
         x = x + gapBtwn
         y = y + gapBtwn
-        # draw grid lines using pygame draw module [draw.line() draws a straight line, takes 4 arguments: surface, colour, start position, end position] - UNDERSTAND START AND END POSITION VALUES??
+        # draw grid lines using pygame draw module [draw.line() draws a straight line, takes 4 arguments: surface, colour, start position, end position]
         pygame.draw.line(surface, (255,255,255), (x,0), (x, w)) # vertical lines
         pygame.draw.line(surface, (255,255,255), (0,y), (w, y)) # horizontal lines      
 
@@ -229,20 +229,20 @@ def drawGrid(w, rows, surface):
 def redrawWindow(surface):
     # make width, rows, s and snack variables global
     global width, rows, s, snack
-    # set (fullscreen mode?) + black background [surface.fill() fills display with colour (no position argument = whole display filled)]
+    # set black background [surface.fill() fills display with colour (no position argument = whole display filled)]
     surface.fill((0,0,0))
-    # draw snake using draw function LINE ?
+    # draw snake using draw function (LINE 195)
     s.draw(surface)
     # draw snack
     snack.draw(surface)
-    # call drawGrid() function
+    # call drawGrid() function (LINE 213)
     drawGrid(width, rows, surface)
     # update window using pygame display module [display.update() updates a portion of a software display, value given as argument (no argument = update entire display)]
     pygame.display.update()
 
 # Create randomSnack function:
 def randomSnack(rows, item): # <item> parameter = snake object
-    # make copy of snake cube objects list (LINE 85)
+    # make copy of snake cube objects list
     positions = item.body
     # Create infinite loop to randomise 'snack' grid position:
     while True:
@@ -261,14 +261,23 @@ def randomSnack(rows, item): # <item> parameter = snake object
     return (x,y)
 
 # Create message_box function:
-def message_box(subject, content):
+def message_box(subject, content): # subject paramater = message box title, content parameter = message box content
+
+    # create main window (root) for displaying GUI components [.Tk() initialises a root window which acts as a container for all other widgets in the app (e.g. text boxes, buttons)]
     root = tk.Tk()
+    # ensure message box appears on top of any other open windows [.attributes() is a built-in tkinter method used to modify various attributes of a Tk() root window]
     root.attributes('-topmost', True)
+    # hide the root window (only want to see the message box) [.withdraw() is a built-in tkinter method used to hide a Tk() window]
     root.withdraw()
+    # display message box [messagebox is a tkinter module that provides a selection of pre-defined message boxes (e.g. showinfo, showwarning, askquestion etc)] [.showinfo() is a tkinter.messagebox method used to display a pop-up informational dialogue window which requires user interaction]
     messagebox.showinfo(subject, content)
+    # attempt to remove root window and destroy all resources associated with it (i.e. message box)
     try:
+        # [.destroy() is an in-built tkinter method that closes a .Tk() window and releases its resources]
         root.destroy()
+    # if any errors are encountered when calling root.destroy()
     except:
+        # ignore and continue programme
         pass
 
 
@@ -283,9 +292,9 @@ def game():
     rows = 20
     # create game grid using pygame display module [display.set_mode() creates a display surface (i.e. initialises a window or screen for display)]
     win = pygame.display.set_mode((width, width))
-    # create snake using snake class LINE 73 (colour (red), position (row 10 column 10))
+    # create snake using snake class (LINE 73) (colour (red), position (row 10 column 10))
     s = snake((255,0,0), (10,10))
-    # create random snack (LINE 213) using cube class (LINE 27)
+    # create random snack with randomSnack function (LINE 244) using cube class (LINE 27)
     snack = cube(randomSnack(rows, s), colour=(0,255,0))
     # declare flag as True
     flag = True
@@ -303,12 +312,12 @@ def game():
         # prevent game from running at > 10 frames per second - means snake can move max 10 squares per second? (lower value = lower game speed because less frames per second) ['tick' argument = framerate per second, value in milliseconds]
         clock.tick(10)
 
-        # Call move function (LINE 89?)
+        # Call move function
         s.move()
 
         # Check if head snake cube has hit snack poisiton:
         if s.body[0].pos == snack.pos:
-            # increase snake object length by 1 using addCube function LINE 162
+            # increase snake object length by 1 using addCube function (LINE 173)
             s.addCube()
             # create new random snack
             snack = cube(randomSnack(rows, s), colour=(0,255,0))
@@ -318,14 +327,14 @@ def game():
             if s.body[x].pos in list(map(lambda z:z.pos, s.body[x+1:])):
                 # if so, print message to console (score = length of snake)
                 print('Score: ', len(s.body))
-                # display message box using message_box() function LINE 253 - ???
+                # display message box using message_box() function LINE 264
                 message_box('You lost!', 'Play again...')
-                # reset snake to start position (middle of grid) using reset function LINE 158
+                # reset snake to start position (middle of grid) using reset function (LINE 163)
                 s.reset((10,10))
                 # break loop
                 break
 
-        # redraw window (LINE 202) surface (win variable LINE 241):
+        # redraw window surface with redrawWindow function (LINE 229) (win variable SEE LINE 294):
         redrawWindow(win)
 
     
