@@ -3,7 +3,7 @@
 # obj = dict(enumerate(arr))
 
 # print(obj)
-# for item in obj: 
+# for item in obj:
 #     print(item)
 
 # class snake():
