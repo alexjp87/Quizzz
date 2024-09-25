@@ -323,9 +323,9 @@ def game():
         # Call move function
         s.move()
 
-        # Check if head snake cube has hit a snack poisiton:
-        if s.body[0].pos == snack1.pos or s.body[0] == snack2.pos or s.body[0] == snack3.pos or s.body[0] == snack4:
-            # increase snake object length by 1 using addCube function (LINE 173)
+        # Check if head snake head cube has hit a snack poisiton:
+        if s.body[0].pos in (snack1.pos, snack2.pos, snack3.pos, snack4.pos):
+            # if so, increase snake object length by 1 using addCube function (LINE 173)
             s.addCube()
             # create new random snacks
             snack1 = cube(randomSnack(rows, s), colour=(0,255,0))
@@ -367,5 +367,10 @@ game()
 
 """
 - Add condition so can't turn back on self? e.g. if moving left can only turn up or down not right, or if moving up can only move left or right not down
+
+- Add speed control buttons?
+
+- Change position of eyes depending on direction?
+
 
 """
