@@ -190,7 +190,6 @@ class snake(object):
         self.body[-1].dirnx = dx
         self.body[-1].dirny = dy
 
-
     # Create draw function:
     def draw(self, surface):
         # loop through indexes (i) and cube objects (c) in enumerated self.body list (i.e. loop through snake)
@@ -225,6 +224,7 @@ def drawGrid(w, rows, surface):
         pygame.draw.line(surface, (255,255,255), (x,0), (x, w)) # vertical lines
         pygame.draw.line(surface, (255,255,255), (0,y), (w, y)) # horizontal lines      
 
+
 # Create redrawWindow function:
 def redrawWindow(surface):
     # make width, rows, s and snack variables global
@@ -239,6 +239,7 @@ def redrawWindow(surface):
     drawGrid(width, rows, surface)
     # update window using pygame display module [display.update() updates a portion of a software display, value given as argument (no argument = update entire display)]
     pygame.display.update()
+
 
 # Create randomSnack function:
 def randomSnack(rows, item): # <item> parameter = snake object
@@ -259,6 +260,7 @@ def randomSnack(rows, item): # <item> parameter = snake object
             break
     # and return randomised snack position
     return (x,y)
+
 
 # Create message_box function:
 def message_box(subject, content): # subject paramater = message box title, content parameter = message box content
@@ -340,7 +342,13 @@ def game():
     
 #-------------------------------------------------------------#
 
-## Call game()
+### GAME
+
+#
+#
+#
+
+## Call game() function (LINE 287)
 game()
 
 
