@@ -249,6 +249,7 @@ def randomSnack(rows, item): # <item> parameter = snake object
     # make copy of snake cube objects list
     positions = item.body
     # Create infinite loop to randomise 'snack' grid position:
+    
     while True:
         # pick random x and y co-ordinates between 0 and 20 [random.randrange() returns a randomly selected element from a specified range (only one value in range defaults to stop value)(rows = 20, LINE 29)]
         x = random.randrange(rows)
@@ -257,8 +258,14 @@ def randomSnack(rows, item): # <item> parameter = snake object
         if len(list(filter(lambda z:z.pos == (x,y), positions))) > 0:
             # if so, loop again (i.e. re-randomise co-ordinates)
             continue
+        # check snacks don't overlap
+        elif (x,y) in snackList:
+            # if so, loop again
+            continue
         # else:
         else:
+            # append snack position to snackList
+            snackList.append((x,y))
             # break loop
             break
     # and return randomised snack position
@@ -290,11 +297,13 @@ def message_box(subject, content): # subject paramater = message box title, cont
 def game():
     ## Create game grid:
     # make width, rows, s and snack variables global
-    global width, rows, s, snack1, snack2, snack3, snack4
+    global width, rows, s, snack1, snack2, snack3, snack4, snackList
     # set initial width to 500 (height not needed because creating square grid (20 rows x 20 columns, 500px width x 500px height))
     width = 500
     # set initial rows to 20 (needs to divide by height)
     rows = 20
+    # create initial empty snackList
+    snackList = []
     # create game grid using pygame display module [display.set_mode() creates a display surface (i.e. initialises a window or screen for display)]
     win = pygame.display.set_mode((width, width))
     # create snake using snake class (LINE 73) (colour (red), position (row 10 column 10))
@@ -327,6 +336,8 @@ def game():
         if s.body[0].pos in (snack1.pos, snack2.pos, snack3.pos, snack4.pos):
             # if so, increase snake object length by 1 using addCube function (LINE 173)
             s.addCube()
+            # clear snackList
+            snackList = []
             # create new random snacks
             snack1 = cube(randomSnack(rows, s), colour=(0,255,0))
             snack2 = cube(randomSnack(rows, s), colour=(255,0,0))
@@ -339,14 +350,14 @@ def game():
             if s.body[x].pos in list(map(lambda z:z.pos, s.body[x+1:])):
                 # if so, print message to console (score = length of snake)
                 print('Score: ', len(s.body))
-                # display message box using message_box() function LINE 264
+                # display message box using message_box() function LINE 266
                 message_box('You lost!', 'Play again...')
                 # reset snake to start position (middle of grid) using reset function (LINE 163)
                 s.reset((10,10))
                 # break loop
                 break
 
-        # redraw window surface with redrawWindow function (LINE 229) (win variable SEE LINE 294):
+        # redraw window surface with redrawWindow function (LINE 229) (win variable SEE LINE 296):
         redrawWindow(win)
 
     
@@ -366,6 +377,8 @@ game()
 
 
 """
+- Change pos and move variable names (existing pyhton functions/keywords)
+
 - Add condition so can't turn back on self? e.g. if moving left can only turn up or down not right, or if moving up can only move left or right not down
 
 - Add speed control buttons?
