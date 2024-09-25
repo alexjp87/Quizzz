@@ -228,13 +228,16 @@ def drawGrid(w, rows, surface):
 # Create redrawWindow function:
 def redrawWindow(surface):
     # make width, rows, s and snack variables global
-    global width, rows, s, snack
+    global width, rows, s, snack1, snack2, snack3, snack4
     # set black background [surface.fill() fills display with colour (no position argument = whole display filled)]
     surface.fill((0,0,0))
     # draw snake using draw function (LINE 195)
     s.draw(surface)
-    # draw snack
-    snack.draw(surface)
+    # draw snacks
+    snack1.draw(surface)
+    snack2.draw(surface)
+    snack3.draw(surface)
+    snack4.draw(surface)
     # call drawGrid() function (LINE 213)
     drawGrid(width, rows, surface)
     # update window using pygame display module [display.update() updates a portion of a software display, value given as argument (no argument = update entire display)]
@@ -287,7 +290,7 @@ def message_box(subject, content): # subject paramater = message box title, cont
 def game():
     ## Create game grid:
     # make width, rows, s and snack variables global
-    global width, rows, s, snack
+    global width, rows, s, snack1, snack2, snack3, snack4
     # set initial width to 500 (height not needed because creating square grid (20 rows x 20 columns, 500px width x 500px height))
     width = 500
     # set initial rows to 20 (needs to divide by height)
@@ -296,8 +299,11 @@ def game():
     win = pygame.display.set_mode((width, width))
     # create snake using snake class (LINE 73) (colour (red), position (row 10 column 10))
     s = snake((255,0,0), (10,10))
-    # create random snack with randomSnack function (LINE 244) using cube class (LINE 27)
-    snack = cube(randomSnack(rows, s), colour=(0,255,0))
+    # create 4 randomly positioned different coloured snacks with randomSnack function (LINE 244) using cube class (LINE 27)
+    snack1 = cube(randomSnack(rows, s), colour=(0,255,0))
+    snack2 = cube(randomSnack(rows, s), colour=(255,0,0))
+    snack3 = cube(randomSnack(rows, s), colour=(0,0,255))
+    snack4 = cube(randomSnack(rows, s), colour=(0,255,255))
     # declare flag as True
     flag = True
     # Create Clock object using pygame time module [time.Clock() creates an object for tracking time]
@@ -317,12 +323,16 @@ def game():
         # Call move function
         s.move()
 
-        # Check if head snake cube has hit snack poisiton:
-        if s.body[0].pos == snack.pos:
-            # increase snake object length by 1 using addCube function (LINE 173)
+        # Check if head snake head cube has hit a snack poisiton:
+        if s.body[0].pos in (snack1.pos, snack2.pos, snack3.pos, snack4.pos):
+            # if so, increase snake object length by 1 using addCube function (LINE 173)
             s.addCube()
-            # create new random snack
-            snack = cube(randomSnack(rows, s), colour=(0,255,0))
+            # create new random snacks
+            snack1 = cube(randomSnack(rows, s), colour=(0,255,0))
+            snack2 = cube(randomSnack(rows, s), colour=(255,0,0))
+            snack3 = cube(randomSnack(rows, s), colour=(0,0,255))
+            snack4 = cube(randomSnack(rows, s), colour=(0,255,255))
+
         # Check for snake colliding with self:
         for x in range(len(s.body)):
             # check if the position (x,y) of any snake body cube object is currently occupied by another snake cube object, i.e. snake has collided with itself [filter(<function>,<iterable>) returns an iterable that is run through a function which tests items against a condition] [lambda denotes an anonymous funtion]
@@ -357,5 +367,10 @@ game()
 
 """
 - Add condition so can't turn back on self? e.g. if moving left can only turn up or down not right, or if moving up can only move left or right not down
+
+- Add speed control buttons?
+
+- Change position of eyes depending on direction?
+
 
 """
