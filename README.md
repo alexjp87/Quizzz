@@ -20,6 +20,10 @@ Phase 1 will be building an object-oriented version of snake using a FreeCodeCam
 
 Then I aim to edit the code and implement one by one each of the features required for my application idea, with the design and implementation of each feature representing a new development phase.
 
+- Sprint #1: snake tutorial
+- Sprint #2: multi-snack functionality (branch: multi-snack)
+- Sprint #3: prevent snacks overlapping functionality (branch: snack-overlap)
+
 ### User stories
 
 From the perspective of the user:
